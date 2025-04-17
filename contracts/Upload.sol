@@ -8,14 +8,22 @@ contract Upload {
      address user; 
      bool access; //true or false
   }
-  mapping(address=>string[]) value;
+
+  struct File {
+      string cid;
+      string fileName;
+      // other properties...
+  }
+
+  mapping(address=>File[]) value;
   mapping(address=>mapping(address=>bool)) ownership;
   mapping(address=>Access[]) accessList;
   mapping(address=>mapping(address=>bool)) previousData;
 
-  function add(address _user,string memory url) external {
-      value[_user].push(url);
+  function add(string memory _cid, string memory _fileName) external {
+      value[msg.sender].push(File(_cid, _fileName));
   }
+
   function allow(address user) external {//def
       ownership[msg.sender][user]=true; 
       if(previousData[msg.sender][user]){
@@ -39,7 +47,7 @@ contract Upload {
       }
   }
 
-  function display(address _user) external view returns(string[] memory){
+  function display(address _user) external view returns(File[] memory){
       require(_user==msg.sender || ownership[_user][msg.sender],"You don't have access");
       return value[_user];
   }
